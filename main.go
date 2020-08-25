@@ -84,6 +84,7 @@ func registerCommands() {
 	cmdHandler.Register("default", cmd.DefaultCommand, []string{})
 	cmdHandler.Register("hi", cmd.HiCommand, []string{"안녕", "반가워"})
 	cmdHandler.Register("money", cmd.MoneyCommand, []string{"돈"})
+	cmdHandler.Register("br", cmd.BrCommand, []string{"배라", "배스킨라빈스", "31", "배라31", "배스킨라빈스31"})
 }
 
 func commandHandler(discord *discordgo.Session, message *discordgo.MessageCreate) {
