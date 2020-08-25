@@ -81,7 +81,8 @@ func main() {
 }
 
 func registerCommands() {
-	cmdHandler.Register("안녕", cmd.HiCommand, []string{"안뇽", "반가워"})
+	cmdHandler.Register("default", cmd.DefaultCommand, []string{})
+	cmdHandler.Register("hi", cmd.HiCommand, []string{"안녕", "반가워"})
 }
 
 func commandHandler(discord *discordgo.Session, message *discordgo.MessageCreate) {
@@ -90,25 +91,10 @@ func commandHandler(discord *discordgo.Session, message *discordgo.MessageCreate
 		return
 	}
 	content := message.Content
-	if len(content) <= len(prefix) {
+	if len(content) < len(prefix) {
 		return
 	}
 	if content[:len(prefix)] != prefix {
-		return
-	}
-	content = content[len(prefix):]
-	if len(content) < 1 {
-		return
-	}
-
-	if !framework.CheckUserExist(user.ID) {
-		framework.AddUser(user.ID)
-	}
-
-	args := strings.Fields(content)
-	name := strings.ToLower(args[0])
-	command, found := cmdHandler.Get(name)
-	if !found {
 		return
 	}
 	channel, err := discord.State.Channel(message.ChannelID)
@@ -122,6 +108,26 @@ func commandHandler(discord *discordgo.Session, message *discordgo.MessageCreate
 		if err != nil {
 			fmt.Println("[ERROR] getting Guild", err)
 		}
+	}
+	content = content[len(prefix):]
+	if len(content) < 1 {
+		if command, found := cmdHandler.Get("default"); found {
+			ctx := framework.NewContext(discord, guild, channel, user, message.Message)
+			c := *command
+			go c(ctx)
+		}
+		return
+	}
+
+	if !framework.CheckUserExist(user.ID) {
+		framework.AddUser(user.ID)
+	}
+
+	args := strings.Fields(content)
+	name := strings.ToLower(args[0])
+	command, found := cmdHandler.Get(name)
+	if !found {
+		return
 	}
 
 	ctx := framework.NewContext(discord, guild, channel, user, message.Message)
