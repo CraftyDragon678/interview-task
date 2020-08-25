@@ -8,6 +8,7 @@ type (
 	CommandStruct struct {
 		name    string
 		command Command
+		aliases []string
 	}
 
 	// CommandHandler handler of command
@@ -35,13 +36,18 @@ func (handler CommandHandler) Get(name string) (*Command, bool) {
 		if cmd.name == name {
 			return &cmd.command, true
 		}
+		for _, alias := range cmd.aliases {
+			if alias == name {
+				return &cmd.command, true
+			}
+		}
 	}
 	return nil, false
 }
 
 // Register command
-func (handler *CommandHandler) Register(name string, command Command) {
-	cmdstruct := CommandStruct{name: name, command: command}
+func (handler *CommandHandler) Register(name string, command Command, aliases []string) {
+	cmdstruct := CommandStruct{name, command, aliases}
 	handler.cmds = append(handler.cmds, cmdstruct)
 }
 

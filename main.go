@@ -81,7 +81,7 @@ func main() {
 }
 
 func registerCommands() {
-	cmdHandler.Register("안녕", cmd.HiCommand)
+	cmdHandler.Register("안녕", cmd.HiCommand, []string{"안뇽", "반가워"})
 }
 
 func commandHandler(discord *discordgo.Session, message *discordgo.MessageCreate) {
